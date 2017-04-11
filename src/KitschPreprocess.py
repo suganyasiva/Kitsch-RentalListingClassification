@@ -12,6 +12,7 @@ from sklearn import preprocessing
 import string
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
+from nltk.stem import WordNetLemmatizer
 from scipy.stats import mode
 
 class KitschPreprocess:
@@ -66,6 +67,9 @@ class KitschPreprocess:
 #            stemmer = PorterStemmer()
 #            cleantextlist = [stemmer.stem(i) for i in cleantext.lower().split()]      #stem the word  
 #            cleantext = ' '.join(cleantextlist)
+            lemmatizer = WordNetLemmatizer()
+            cleantextlist = [lemmatizer.lemmatize(i) for i in cleantext.lower().split()]
+            cleantext = ' '.join(cleantextlist)
             stop = set(stopwords.words('english')) - set(('and', 'or', 'not'))
             cleantextlist = [i for i in cleantext.lower().split() if i not in stop]      #remove stopwords except few exceptions  
             cleantext = ' '.join(cleantextlist)
