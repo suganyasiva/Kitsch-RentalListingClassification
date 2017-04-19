@@ -42,12 +42,6 @@ for i in range(number_of_folds):
     test_data_labels = labels[i*subset_size:][:subset_size]
     train_data_labels = labels[:i*subset_size] + labels[(i+1)*subset_size:]
     
-#    """
-#    display address split
-#    """
-#    test_display_address = display_address_list[i*subset_size:][:subset_size]
-#    train_display_address = display_address_list[:i*subset_size] + display_address_list[(i+1)*subset_size:]
-
     """
     street address split
     """
@@ -67,25 +61,36 @@ for i in range(number_of_folds):
     tfidf_matrix = tfidf_vectorizer.fit_transform(train_description)
     test_tfidf_matrix = tfidf_vectorizer.transform(test_description)
     
-#    dt_description_classifier = tree.DecisionTreeClassifier().fit(tfidf_matrix, train_data_labels)
-#    predictions = dt_description_classifier.predict(test_tfidf_matrix)
-##    dt_description_report.append(classification_report(test_data_labels, predictions))
-##    dt_description_accuracy_list.append(accuracy_score(test_data_labels, predictions))
-#    predictions_list.append(predictions)
-#    
-#    dt_street_address_classifier = tree.DecisionTreeClassifier().fit(tfidf_matrix, train_data_labels)
-#    predictions = dt_street_address_classifier.predict(test_tfidf_matrix)
-##    dt_street_address_report.append(classification_report(test_data_labels, predictions))
-##    dt_street_address_accuracy_list.append(accuracy_score(test_data_labels, predictions))
-#    predictions_list.append(predictions)
+    print("Fold " + str(i) + " description classifier starts")
+    dt_description_classifier = tree.DecisionTreeClassifier().fit(tfidf_matrix, train_data_labels)
+    predictions = dt_description_classifier.predict(test_tfidf_matrix)
+#    dt_description_report.append(classification_report(test_data_labels, predictions))
+#    dt_description_accuracy_list.append(accuracy_score(test_data_labels, predictions))
+    predictions_list.append(predictions)
     
+    tfidf_vectorizer = TfidfVectorizer(ngram_range = (1,3), min_df=0,
+                             max_df = 1.0,
+                             sublinear_tf=True,
+                             use_idf=True)
+    tfidf_matrix = tfidf_vectorizer.fit_transform(train_street_address)
+    test_tfidf_matrix = tfidf_vectorizer.transform(test_street_address)
+    
+    print("Fold " + str(i) + " street address classifier starts")
+    dt_street_address_classifier = tree.DecisionTreeClassifier().fit(tfidf_matrix, train_data_labels)
+    predictions = dt_street_address_classifier.predict(test_tfidf_matrix)
+#    dt_street_address_report.append(classification_report(test_data_labels, predictions))
+#    dt_street_address_accuracy_list.append(accuracy_score(test_data_labels, predictions))
+    predictions_list.append(predictions)
+    
+    print("Fold " + str(i) + " numerical classifier starts")
     dt_classifier = tree.DecisionTreeClassifier().fit(train_data, train_data_labels)
     predictions = dt_classifier.predict(test_data)
 #    dt_report.append(classification_report(test_data_labels, predictions))
 #    dt_accuracy_list.append(accuracy_score(test_data_labels, predictions))
-#    predictions_list.append(predictions)
+    predictions_list.append(predictions)
     
-#    predictions = majority_vote(predictions_list)
+    print("Fold " + str(i) + " classification report starts")
+    predictions = kitsch_preprocess.majority_vote(predictions_list)
     dt_report.append(classification_report(test_data_labels, predictions))
     dt_accuracy_list.append(accuracy_score(test_data_labels, predictions))
 

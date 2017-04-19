@@ -11,7 +11,6 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 from KitschPreprocess import KitschPreprocess
 
-
 kitsch_preprocess = KitschPreprocess()
         
 #xls_to_txt("training.xlsx", "training_csv.txt")
@@ -68,6 +67,7 @@ for i in range(number_of_folds):
     tfidf_matrix = tfidf_vectorizer.fit_transform(train_description)
     test_tfidf_matrix = tfidf_vectorizer.transform(test_description)
     
+    print("Fold " + str(i) + " description classifier starts")
     ab_description_classifier = AdaBoostClassifier().fit(tfidf_matrix, train_data_labels)
     predictions = ab_description_classifier.predict(test_tfidf_matrix)
 #    pp = ab_description_classifier.predict_proba(test_tfidf_matrix)
@@ -75,24 +75,28 @@ for i in range(number_of_folds):
 #    ab_description_accuracy_list.append(accuracy_score(test_data_labels, predictions))
     predictions_list.append(predictions)
     
-#    ab_display_address_classifier = AdaBoostClassifier().fit(tfidf_matrix, train_data_labels)
-#    predictions = ab_display_address_classifier.predict(test_tfidf_matrix)
-##    ab_display_address_report.append(classification_report(test_data_labels, predictions))
-##    ab_display_address_accuracy_list.append(accuracy_score(test_data_labels, predictions))
-#    predictions_list.append(predictions)
+    tfidf_vectorizer = TfidfVectorizer(ngram_range = (1,3), min_df=0,
+                             max_df = 1.0,
+                             sublinear_tf=True,
+                             use_idf=True)
+    tfidf_matrix = tfidf_vectorizer.fit_transform(train_street_address)
+    test_tfidf_matrix = tfidf_vectorizer.transform(test_street_address)
     
+    print("Fold " + str(i) + " street address classifier starts")
     ab_street_address_classifier = AdaBoostClassifier().fit(tfidf_matrix, train_data_labels)
     predictions = ab_street_address_classifier.predict(test_tfidf_matrix)
 #    ab_street_address_report.append(classification_report(test_data_labels, predictions))
 #    ab_street_address_accuracy_list.append(accuracy_score(test_data_labels, predictions))
     predictions_list.append(predictions)
     
+    print("Fold " + str(i) + " numerical classifier starts")
     ab_classifier = AdaBoostClassifier().fit(train_data, train_data_labels)
     predictions = ab_classifier.predict(test_data)
 #    ab_report.append(classification_report(test_data_labels, predictions))
 #    ab_accuracy_list.append(accuracy_score(test_data_labels, predictions))
     predictions_list.append(predictions)
     
+    print("Fold " + str(i) + " classification report starts")
     predictions = kitsch_preprocess.majority_vote(predictions_list)
     ab_report.append(classification_report(test_data_labels, predictions))
     ab_accuracy_list.append(accuracy_score(test_data_labels, predictions))
